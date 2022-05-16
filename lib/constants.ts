@@ -1,0 +1,1 @@
+export const POSTMAN_OPTIONS = "__POSTMAN_OPTIONS__";
