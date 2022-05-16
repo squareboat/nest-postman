@@ -1,6 +1,6 @@
 {
-  "name": "nest-social-auth",
-  "version": "0.1.0",
+  "name": "nest-postman",
+  "version": "0.0.1",
   "description": "The social authentication library for your NestJS Applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,12 +12,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/chhabra1112/nest-social-auth.git"
+    "url": "git+https://github.com/chhabra1112/nest-social-auth.git"
   },
   "bugs": {
     "url": "https://github.com/chhabra1112/nest-social-auth/issues"
   },
-  "homepage": "",
+  "homepage": "https://github.com/chhabra1112/nest-social-auth#readme",
   "author": "Piyush Chhabra <piyushchhabra.1198@gmail.com>",
   "private": false,
   "scripts": {
@@ -45,5 +45,8 @@
     "@nestjs/common": "^6.7.0 || ^7.0.0",
     "@nestjs/core": "^6.7.0 || ^7.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "directories": {
+    "lib": "lib"
+  }
 }
