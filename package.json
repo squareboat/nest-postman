@@ -12,12 +12,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chhabra1112/nest-social-auth.git"
+    "url": "git+https://github.com/chhabra1112/nest-postman.git"
   },
   "bugs": {
-    "url": "https://github.com/chhabra1112/nest-social-auth/issues"
+    "url": "https://github.com/chhabra1112/nest-postman/issues"
   },
-  "homepage": "https://github.com/chhabra1112/nest-social-auth#readme",
+  "homepage": "https://github.com/chhabra1112/nest-postman#readme",
   "author": "Piyush Chhabra <piyushchhabra.1198@gmail.com>",
   "private": false,
   "scripts": {
