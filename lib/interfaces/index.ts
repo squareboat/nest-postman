@@ -1,24 +1,20 @@
-import { ModuleMetadata, Type } from '@nestjs/common';
-import { QueueDriver } from '@squareboat/nest-queue-strategy';
-
-export interface QueueDriverOptions {
-  driver: Type<QueueDriver>;
-  [key: string]: string | number | Record<string, any>;
-}
-
+import { ModuleMetadata, Type } from "@nestjs/common"
 export interface PostmanOptions {
-  isGlobal?: boolean;
-  url: string;
-  prefix: string;
+  isGlobal?: boolean
+  url: string
+  prefix: string
+  filePath?: string
+  collectionName: string
+  description: string
 }
 
 export interface PostmanAsyncOptionsFactory {
-  createPostmanOptions(): Promise<PostmanOptions> | PostmanOptions;
+  createPostmanOptions(): Promise<PostmanOptions> | PostmanOptions
 }
 
-export interface PostmanAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
-  useExisting?: Type<PostmanOptions>;
-  useClass?: Type<PostmanAsyncOptionsFactory>;
-  useFactory?: (...args: any[]) => Promise<PostmanOptions> | PostmanOptions;
-  inject?: any[];
+export interface PostmanAsyncOptions extends Pick<ModuleMetadata, "imports"> {
+  useExisting?: Type<PostmanOptions>
+  useClass?: Type<PostmanAsyncOptionsFactory>
+  useFactory?: (...args: any[]) => Promise<PostmanOptions> | PostmanOptions
+  inject?: any[]
 }

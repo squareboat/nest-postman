@@ -1,80 +1,67 @@
-import { uuid } from '@libs/core';
-import { Injectable, OnModuleInit, RequestMethod } from '@nestjs/common';
-import { DiscoveryService, MetadataScanner } from '@nestjs/core';
-import { lowerCase, upperFirst } from 'lodash';
-import { PostmanService } from './service';
-// import { JOB_NAME, JOB_OPTIONS } from './constants';
-// import { QueueMetadata } from './metadata';
+import { Injectable, OnModuleInit } from "@nestjs/common"
+import { DiscoveryService, MetadataScanner } from "@nestjs/core"
+import { lowerCase, upperFirst } from "lodash"
+import { Methods } from "./constants"
+import { PostmanService } from "./service"
 
 @Injectable()
 export class PostmanExplorer implements OnModuleInit {
+  private crypto
   constructor(
     private readonly discovery: DiscoveryService,
     private readonly metadataScanner: MetadataScanner,
-    private readonly collection: PostmanService,
-  ) {}
+    private readonly collection: PostmanService
+  ) {
+    this.crypto = new Crypto()
+  }
 
-  onModuleInit() {
-    const wrappers = this.discovery.getControllers();
-    wrappers.forEach((w) => {
-      const { instance, name } = w;
+  async onModuleInit() {
+    const wrappers = this.discovery.getControllers()
+    wrappers.forEach((w: Record<string, any>) => {
+      const { instance, name } = w
       if (
         !instance ||
-        typeof instance === 'string' ||
+        typeof instance === "string" ||
         !Object.getPrototypeOf(instance)
       ) {
-        return;
+        return
       }
-      const moduleName = upperFirst(lowerCase(name)).replace(' controller', '');
+      const moduleName = upperFirst(lowerCase(name)).replace(" controller", "")
       this.collection.addItemGroup({
-        id: uuid(),
+        id: this.crypto.randomUUID(),
         name: moduleName,
-        prefix: Reflect.getMetadata('path', w['token']),
+        prefix: Reflect.getMetadata("path", w["token"] as Object),
         item: [],
-      });
-      //   console.log(Object.keys(w), Reflect.getMetadata('path', w['token']));
+      })
       this.metadataScanner.scanFromPrototype(
         instance,
         Object.getPrototypeOf(instance),
-        (key: string) => this.lookupRoutes(instance, key, moduleName),
-      );
-    });
-    this.collection.printCollection();
+        (key: string) => this.lookupRoutes(instance, key, moduleName)
+      )
+    })
+    this.collection.printCollection()
   }
 
   lookupRoutes(
-    instance: Record<string, Function>,
+    instance: Record<string, () => any>,
     key: string,
-    groupName: string,
+    groupName: string
   ) {
-    const methodRef = instance[key];
+    const isMethod = Reflect.hasOwnMetadata("method", instance[key])
+    if (!isMethod) return
+    const method = Reflect.getMetadata("method", instance[key])
+    const path = Reflect.getMetadata("path", instance[key])
 
-    const isMethod = Reflect.hasOwnMetadata('method', instance[key]);
-    // console.log(Reflect.getOwnMetadataKeys(instance));
-    if (!isMethod) return;
-    const method = Reflect.getMetadata('method', instance[key]);
-    const path = Reflect.getMetadata('path', instance[key]);
-    // console.log(isMethod, method, path, methodRef, instance);
-    const Methods = [
-      'GET',
-      'POST',
-      'PUT',
-      'DELETE',
-      'PATCH',
-      'ALL',
-      'OPTIONS',
-      'HEAD',
-    ];
     this.collection.addItemGroupItem(
       {
-        id: uuid(),
+        id: this.crypto.randomUUID(),
         name: key,
         request: {
           url: path,
           method: Methods[method],
         },
       },
-      groupName,
-    );
+      groupName
+    )
   }
 }

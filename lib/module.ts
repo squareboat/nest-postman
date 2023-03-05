@@ -1,20 +1,13 @@
-import {
-  DynamicModule,
-  INestApplication,
-  Module,
-  Provider,
-  Type,
-} from '@nestjs/common';
-import { DiscoveryModule } from '@nestjs/core';
-import { POSTMAN_OPTIONS } from './constants';
-import { PostmanExplorer } from './explorer';
+import { DynamicModule, Module, Provider, Type } from "@nestjs/common"
+import { DiscoveryModule } from "@nestjs/core"
+import { POSTMAN_OPTIONS } from "./constants"
+import { PostmanExplorer } from "./explorer"
 import {
   PostmanAsyncOptions,
   PostmanAsyncOptionsFactory,
   PostmanOptions,
-} from './interfaces';
-import { PostmanService } from './service';
-import { getGlobalPrefix } from './utils';
+} from "./interfaces"
+import { PostmanService } from "./service"
 
 @Module({})
 export class PostmanModule {
@@ -27,8 +20,12 @@ export class PostmanModule {
       global: options.isGlobal || false,
       module: PostmanModule,
       imports: [DiscoveryModule],
-      providers: [{ provide: POSTMAN_OPTIONS, useValue: options },PostmanService, PostmanExplorer ],
-    };
+      providers: [
+        { provide: POSTMAN_OPTIONS, useValue: options },
+        PostmanService,
+        PostmanExplorer,
+      ],
+    }
   }
 
   /**
@@ -38,29 +35,33 @@ export class PostmanModule {
     return {
       module: PostmanModule,
       imports: [DiscoveryModule],
-      providers: [this.createPostmanOptionsProvider(options),PostmanService, PostmanExplorer ],
-    };
+      providers: [
+        this.createPostmanOptionsProvider(options),
+        PostmanService,
+        PostmanExplorer,
+      ],
+    }
   }
   private static createPostmanOptionsProvider(
-    options: PostmanAsyncOptions,
+    options: PostmanAsyncOptions
   ): Provider {
     if (options.useFactory) {
       return {
         provide: POSTMAN_OPTIONS,
         useFactory: options.useFactory,
         inject: options.inject || [],
-      };
+      }
     }
 
     const inject = [
       (options.useClass || options.useExisting) as Type<PostmanOptions>,
-    ];
+    ]
 
     return {
       provide: POSTMAN_OPTIONS,
       useFactory: async (optionsFactory: PostmanAsyncOptionsFactory) =>
         await optionsFactory.createPostmanOptions(),
       inject,
-    };
+    }
   }
 }
