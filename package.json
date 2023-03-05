@@ -1,14 +1,16 @@
 {
   "name": "nest-postman",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "The social authentication library for your NestJS Applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "keywords": [
     "nestjs",
-    "nestjs-queue",
-    "nestjs-queueing",
-    "nestjs-sqs"
+    "nestjs-postman",
+    "postman-collection",
+    "collection.json",
+    "postman",
+    "rest apis"
   ],
   "repository": {
     "type": "git",

@@ -3,16 +3,15 @@ import { DiscoveryService, MetadataScanner } from "@nestjs/core"
 import { lowerCase, upperFirst } from "lodash"
 import { Methods } from "./constants"
 import { PostmanService } from "./service"
+import * as crypto from 'crypto'
 
 @Injectable()
 export class PostmanExplorer implements OnModuleInit {
-  private crypto
   constructor(
     private readonly discovery: DiscoveryService,
     private readonly metadataScanner: MetadataScanner,
     private readonly collection: PostmanService
   ) {
-    this.crypto = new Crypto()
   }
 
   async onModuleInit() {
@@ -28,7 +27,7 @@ export class PostmanExplorer implements OnModuleInit {
       }
       const moduleName = upperFirst(lowerCase(name)).replace(" controller", "")
       this.collection.addItemGroup({
-        id: this.crypto.randomUUID(),
+        id: crypto.randomUUID(),
         name: moduleName,
         prefix: Reflect.getMetadata("path", w["token"] as Object),
         item: [],
@@ -54,7 +53,7 @@ export class PostmanExplorer implements OnModuleInit {
 
     this.collection.addItemGroupItem(
       {
-        id: this.crypto.randomUUID(),
+        id: crypto.randomUUID(),
         name: key,
         request: {
           url: path,
