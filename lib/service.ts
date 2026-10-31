@@ -73,13 +73,13 @@ export class PostmanService {
     return next
   }
 
-  /** Write the collection to `<filePath>/collection.json`. */
+  /** Write the collection to `filePath` (a `.json` file, or a directory that gets `collection.json`). */
   printCollection = () => {
-    const dir = this.options.filePath || ""
-    const file = path.join(dir, "collection.json")
+    const filePath = this.options.filePath || ""
+    const file = /\.json$/i.test(filePath) ? filePath : path.join(filePath, "collection.json")
     try {
-      if (dir) fs.mkdirSync(dir, { recursive: true })
-      fs.writeFileSync(file, JSON.stringify(this.data, null, 2))
+      fs.mkdirSync(path.dirname(file), { recursive: true })
+      fs.writeFileSync(file, JSON.stringify(this.data, null, 2) + "\n")
     } catch (e) {
       // a dev tool must not stop the app from starting (e.g. on a read-only file system)
       this.logger.warn(

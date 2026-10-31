@@ -7,7 +7,10 @@ export interface PostmanOptions {
   url: string
   /** Global route prefix of the app (what you pass to `app.setGlobalPrefix()`), e.g. `v1`. */
   prefix?: string
-  /** Directory to write `collection.json` to. Defaults to the current working directory. */
+  /**
+   * Where to write the collection: a path ending in `.json` is the file itself (`postman/api.json`),
+   * anything else is a directory that gets `collection.json`. Defaults to `./collection.json`.
+   */
   filePath?: string
   /** Name of the collection in Postman. */
   collectionName: string

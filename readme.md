@@ -161,7 +161,7 @@ PostmanModule.registerAsync({ imports: [ConfigModule], useClass: PostmanConfig }
 | `collectionName` | yes      | Name of the collection in Postman.                                                                                 |
 | `url`            | yes      | Base URL of your app, e.g. `http://localhost:3000`. A Postman variable such as `{{baseUrl}}` works too.            |
 | `prefix`         | no       | Global route prefix of your app (what you pass to `app.setGlobalPrefix()`), e.g. `v1`.                            |
-| `filePath`       | no       | Directory to write `collection.json` to. It is created if missing. Defaults to the current working directory.     |
+| `filePath`       | no       | Where to write the collection. A path ending in `.json` is the file itself (e.g. `postman/my-api.json`); anything else is a directory that gets `collection.json` (e.g. `postman` writes `postman/collection.json`). Missing directories are created. Defaults to `collection.json` in the current working directory. |
 | `description`    | no       | Description of the collection.                                                                                     |
 | `isGlobal`       | no       | Register the module as global, so `PostmanService` can be injected in every module. `registerAsync()` accepts it too. |
 
@@ -169,7 +169,7 @@ PostmanModule.registerAsync({ imports: [ConfigModule], useClass: PostmanConfig }
 
 ## Usage
 
-When your app starts (`app.listen()` or `app.init()`), `collection.json` is written to `filePath` (or your project directory) and overwritten on every start. Import that file in the Postman app (**File > Import**) and *HOLA*, your Postman collection is ready for use.
+When your app starts (`app.listen()` or `app.init()`), the collection is written to `filePath` (by default `collection.json` in your project directory) and overwritten on every start. Import that file in the Postman app (**File > Import**) and *HOLA*, your Postman collection is ready for use.
 
 The collection has one folder per controller (for example `UsersController` becomes `Users`) and one request per route, with its HTTP method and full URL. Route parameters stay as `:id`, which Postman shows as path variables. Routes declared with `@All()` are exported as `GET` requests.
 
