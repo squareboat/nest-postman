@@ -32,16 +32,23 @@ export function joinUrl(base: string, ...segments: (string | undefined)[]): stri
 
 /**
  * Folder name for a controller class: "UserProfileController" -> "User profile".
- * Same output as lodash `upperFirst(lowerCase(name)).replace(" controller", "")`, which 0.1.0 used.
+ * The name is split into words (camelCase humps, acronyms, digits, and runs of letters without
+ * case such as CJK), lowercased, the first letter upper-cased and a " controller" word dropped.
+ * Accents are removed from Latin letters ("ÉtéController" -> "Ete").
+ * For most ASCII names this matches lodash `upperFirst(lowerCase(name)).replace(" controller", "")`,
+ * which 0.1.0 used, but not always: digits are always split off ("My2ndController" -> "My 2 nd",
+ * lodash "My 2nd") and "ß" is kept ("StraßeController" -> "Straße", lodash "Strasse").
+ * If no words are left, the class name is used as is.
  */
 export function groupName(className: string): string {
   const words =
     className
       .normalize("NFD")
-      .replace(/[̀-ͯ]/g, "")
-      .match(/\p{Lu}+(?=\p{Lu}\p{Ll})|\p{Lu}?\p{Ll}+|\p{Lu}+|\p{N}+/gu) || []
+      .replace(/[\u0300-\u036f]/g, "")
+      .normalize("NFC")
+      .match(/\p{Lu}+(?=\p{Lu}\p{Ll})|[\p{Lu}\p{Lt}]?\p{Ll}+|\p{Lu}+|[\p{Lo}\p{Lm}]+|\p{N}+/gu) || []
   const name = words.join(" ").toLowerCase()
-  return (name.charAt(0).toUpperCase() + name.slice(1)).replace(" controller", "")
+  return (name.charAt(0).toUpperCase() + name.slice(1)).replace(" controller", "") || className
 }
 
 export function toArray<T>(value: T | T[] | undefined): T[] {
