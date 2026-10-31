@@ -1,3 +1,21 @@
+import * as crypto from "crypto"
+
+/**
+ * Name-based UUID (RFC 4122 version 5, SHA-1): the same name and namespace always give the
+ * same id, so the collection does not change between starts.
+ */
+export function uuidV5(name: string, namespace: string): string {
+  const hash = crypto
+    .createHash("sha1")
+    .update(Buffer.from(namespace.replace(/-/g, ""), "hex"))
+    .update(name, "utf8")
+    .digest()
+  hash[6] = (hash[6] & 0x0f) | 0x50
+  hash[8] = (hash[8] & 0x3f) | 0x80
+  const hex = hash.subarray(0, 16).toString("hex")
+  return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join("-")
+}
+
 /**
  * Join a base URL and path segments with single slashes:
  * joinUrl("http://localhost:3000/", "/v1", "users/", "/") -> "http://localhost:3000/v1/users"

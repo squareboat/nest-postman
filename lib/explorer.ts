@@ -1,6 +1,5 @@
 import { Injectable, OnModuleInit, RequestMethod } from "@nestjs/common"
 import { DiscoveryService, MetadataScanner } from "@nestjs/core"
-import * as crypto from "crypto"
 import { METHOD_METADATA, PATH_METADATA } from "./constants"
 import { PostmanService } from "./service"
 import { groupName, joinUrl, toArray } from "./utils"
@@ -18,8 +17,8 @@ export class PostmanExplorer implements OnModuleInit {
       const { metatype } = wrapper
       if (typeof metatype !== "function" || !metatype.prototype) continue
 
-      const group = {
-        id: crypto.randomUUID(),
+      const group: Record<string, any> = {
+        id: undefined, // set by PostmanService, stable across starts
         name: groupName(wrapper.name || metatype.name),
         item: [],
       }
@@ -53,7 +52,7 @@ export class PostmanExplorer implements OnModuleInit {
       for (const routePath of routePaths) {
         this.collection.addItemGroupItem(
           {
-            id: crypto.randomUUID(),
+            id: undefined, // set by PostmanService, stable across starts
             name: key,
             request: { url: joinUrl("", controllerPath, routePath), method },
           },

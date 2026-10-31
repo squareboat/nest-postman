@@ -173,6 +173,8 @@ When your app starts (`app.listen()` or `app.init()`), `collection.json` is writ
 
 The collection has one folder per controller (for example `UsersController` becomes `Users`) and one request per route, with its HTTP method and full URL. Route parameters stay as `:id`, which Postman shows as path variables. Routes declared with `@All()` are exported as `GET` requests.
 
+The ids in the file (the collection's `_postman_id`, folder and request ids) are derived from the collection name, folder names, methods and URLs, so the file only changes when your routes change, and importing it again replaces the collection in Postman instead of adding a copy. Give each app its own `collectionName`.
+
 If the file cannot be written (for example on a read-only file system), a warning is logged and the app starts as usual.
 
 ---
