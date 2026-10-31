@@ -183,6 +183,7 @@ If the file cannot be written (for example on a read-only file system), a warnin
 
 - Only the method and URL of each route are exported. Request bodies, query parameters and headers are not.
 - The URL is built from `url`, `prefix`, the controller path and the route path. Paths added by `RouterModule`, URI versioning (`@Version()`), global prefix exclusions and controller `host` options are not included.
+- Route paths are copied as written. Optional segments (`opt{/:id}`, Nest 11/12) and regular expressions in paths (`re/(.*)`, Nest 10) are not converted, so edit those requests in Postman. Wildcards (`*`, `*splat`, `{*rest}`) are copied too; those requests still reach the route, because the wildcard also matches its own text.
 
 ---
 
