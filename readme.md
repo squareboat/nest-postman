@@ -171,7 +171,7 @@ PostmanModule.registerAsync({ imports: [ConfigModule], useClass: PostmanConfig }
 
 When your app starts (`app.listen()` or `app.init()`), the collection is written to `filePath` (by default `collection.json` in your project directory) and overwritten on every start. Import that file in the Postman app (**File > Import**) and *HOLA*, your Postman collection is ready for use.
 
-The collection has one folder per controller (for example `UsersController` becomes `Users`) and one request per route, with its HTTP method and full URL. Route parameters stay as `:id`, which Postman shows as path variables. Routes declared with `@All()` are exported as `GET` requests.
+The collection has one folder per controller (for example `UsersController` becomes `Users`) and one request per route, with its HTTP method and full URL. If two controllers would get the same folder name, their paths are added, e.g. `Users (users)` and `Users (admin/users)`. Controllers without HTTP routes (for example only `@MessagePattern()` handlers in a hybrid app) are left out. Route parameters stay as `:id`, which Postman shows as path variables. Routes declared with `@All()` are exported as `GET` requests.
 
 The ids in the file (the collection's `_postman_id`, folder and request ids) are derived from the collection name, folder names, methods and URLs, so the file only changes when your routes change, and importing it again replaces the collection in Postman instead of adding a copy. Give each app its own `collectionName`.
 
