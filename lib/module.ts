@@ -25,6 +25,7 @@ export class PostmanModule {
         PostmanService,
         PostmanExplorer,
       ],
+      exports: [PostmanService],
     }
   }
 
@@ -33,15 +34,21 @@ export class PostmanModule {
    */
   static registerAsync(options: PostmanAsyncOptions): DynamicModule {
     return {
+      global: options.isGlobal || false,
       module: PostmanModule,
-      imports: [DiscoveryModule],
+      imports: [DiscoveryModule, ...(options.imports || [])],
       providers: [
         this.createPostmanOptionsProvider(options),
+        ...(options.useClass
+          ? [{ provide: options.useClass, useClass: options.useClass }]
+          : []),
         PostmanService,
         PostmanExplorer,
       ],
+      exports: [PostmanService],
     }
   }
+
   private static createPostmanOptionsProvider(
     options: PostmanAsyncOptions
   ): Provider {
@@ -54,7 +61,7 @@ export class PostmanModule {
     }
 
     const inject = [
-      (options.useClass || options.useExisting) as Type<PostmanOptions>,
+      (options.useClass || options.useExisting) as Type<PostmanAsyncOptionsFactory>,
     ]
 
     return {
