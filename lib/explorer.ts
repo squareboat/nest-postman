@@ -1,8 +1,8 @@
 import { Injectable, OnModuleInit } from "@nestjs/common"
 import { DiscoveryService, MetadataScanner } from "@nestjs/core"
-import { lowerCase, upperFirst } from "lodash"
 import { Methods } from "./constants"
 import { PostmanService } from "./service"
+import { groupName } from "./utils"
 import * as crypto from 'crypto'
 
 @Injectable()
@@ -25,18 +25,18 @@ export class PostmanExplorer implements OnModuleInit {
       ) {
         return
       }
-      const moduleName = upperFirst(lowerCase(name)).replace(" controller", "")
+      const moduleName = groupName(name)
       this.collection.addItemGroup({
         id: crypto.randomUUID(),
         name: moduleName,
         prefix: Reflect.getMetadata("path", w["token"] as Object),
         item: [],
       })
-      this.metadataScanner.scanFromPrototype(
-        instance,
-        Object.getPrototypeOf(instance),
-        (key: string) => this.lookupRoutes(instance, key, moduleName)
-      )
+      for (const key of this.metadataScanner.getAllMethodNames(
+        Object.getPrototypeOf(instance)
+      )) {
+        this.lookupRoutes(instance, key, moduleName)
+      }
     })
     this.collection.printCollection()
   }
