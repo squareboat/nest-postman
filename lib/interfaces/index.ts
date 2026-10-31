@@ -13,7 +13,7 @@ export interface PostmanAsyncOptionsFactory {
 }
 
 export interface PostmanAsyncOptions extends Pick<ModuleMetadata, "imports"> {
-  useExisting?: Type<PostmanOptions>
+  useExisting?: Type<PostmanAsyncOptionsFactory>
   useClass?: Type<PostmanAsyncOptionsFactory>
   useFactory?: (...args: any[]) => Promise<PostmanOptions> | PostmanOptions
   inject?: any[]
