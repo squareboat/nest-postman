@@ -1,8 +1,10 @@
 import { ModuleMetadata, Type } from "@nestjs/common"
 export interface PostmanOptions {
   isGlobal?: boolean
+  /** Base URL of the app, e.g. `http://localhost:3000` or a Postman variable like `{{baseUrl}}`. */
   url: string
-  prefix: string
+  /** Global route prefix of the app (what you pass to `app.setGlobalPrefix()`), e.g. `v1`. */
+  prefix?: string
   filePath?: string
   collectionName: string
   description: string

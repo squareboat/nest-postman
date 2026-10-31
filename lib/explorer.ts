@@ -1,9 +1,9 @@
-import { Injectable, OnModuleInit } from "@nestjs/common"
+import { Injectable, OnModuleInit, RequestMethod } from "@nestjs/common"
 import { DiscoveryService, MetadataScanner } from "@nestjs/core"
-import { Methods } from "./constants"
+import * as crypto from "crypto"
+import { METHOD_METADATA, PATH_METADATA } from "./constants"
 import { PostmanService } from "./service"
-import { groupName } from "./utils"
-import * as crypto from 'crypto'
+import { groupName, joinUrl, toArray } from "./utils"
 
 @Injectable()
 export class PostmanExplorer implements OnModuleInit {
@@ -11,56 +11,61 @@ export class PostmanExplorer implements OnModuleInit {
     private readonly discovery: DiscoveryService,
     private readonly metadataScanner: MetadataScanner,
     private readonly collection: PostmanService
-  ) {
-  }
+  ) {}
 
-  async onModuleInit() {
-    const wrappers = this.discovery.getControllers()
-    wrappers.forEach((w: Record<string, any>) => {
-      const { instance, name } = w
-      if (
-        !instance ||
-        typeof instance === "string" ||
-        !Object.getPrototypeOf(instance)
-      ) {
-        return
-      }
-      const moduleName = groupName(name)
-      this.collection.addItemGroup({
+  onModuleInit() {
+    for (const wrapper of this.discovery.getControllers()) {
+      const { metatype } = wrapper
+      if (typeof metatype !== "function" || !metatype.prototype) continue
+
+      const group = {
         id: crypto.randomUUID(),
-        name: moduleName,
-        prefix: Reflect.getMetadata("path", w["token"] as Object),
+        name: groupName(wrapper.name || metatype.name),
         item: [],
-      })
-      for (const key of this.metadataScanner.getAllMethodNames(
-        Object.getPrototypeOf(instance)
-      )) {
-        this.lookupRoutes(instance, key, moduleName)
       }
-    })
+      this.collection.addItemGroup(group)
+
+      const controllerPaths = toArray<string>(
+        Reflect.getMetadata(PATH_METADATA, metatype)
+      )
+      if (!controllerPaths.length) controllerPaths.push("/")
+
+      const prototype = metatype.prototype
+      for (const key of this.metadataScanner.getAllMethodNames(prototype)) {
+        this.lookupRoutes(prototype[key], key, group.id, controllerPaths)
+      }
+    }
     this.collection.printCollection()
   }
 
   lookupRoutes(
-    instance: Record<string, () => any>,
+    handler: (...args: any[]) => any,
     key: string,
-    groupName: string
+    groupId: string,
+    controllerPaths: string[]
   ) {
-    const isMethod = Reflect.hasOwnMetadata("method", instance[key])
-    if (!isMethod) return
-    const method = Reflect.getMetadata("method", instance[key])
-    const path = Reflect.getMetadata("path", instance[key])
+    if (!Reflect.hasOwnMetadata(METHOD_METADATA, handler)) return
+    const method = toPostmanMethod(Reflect.getMetadata(METHOD_METADATA, handler))
+    const routePaths = toArray<string>(Reflect.getMetadata(PATH_METADATA, handler))
+    if (!routePaths.length) routePaths.push("/")
 
-    this.collection.addItemGroupItem(
-      {
-        id: crypto.randomUUID(),
-        name: key,
-        request: {
-          url: path,
-          method: Methods[method],
-        },
-      },
-      groupName
-    )
+    for (const controllerPath of controllerPaths) {
+      for (const routePath of routePaths) {
+        this.collection.addItemGroupItem(
+          {
+            id: crypto.randomUUID(),
+            name: key,
+            request: { url: joinUrl("", controllerPath, routePath), method },
+          },
+          groupId
+        )
+      }
+    }
   }
+}
+
+/** `@All()` is not an HTTP method; export it as GET. */
+function toPostmanMethod(method: RequestMethod | undefined): string {
+  if (method === undefined || method === RequestMethod.ALL) return "GET"
+  return RequestMethod[method] || "GET"
 }

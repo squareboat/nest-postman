@@ -2,17 +2,19 @@ import { Inject, Injectable } from "@nestjs/common"
 import * as fs from "fs"
 import { POSTMAN_OPTIONS } from "./constants"
 import { PostmanOptions } from "./interfaces"
+import { joinUrl } from "./utils"
 
 @Injectable()
 export class PostmanService {
-  private static data: Record<string, any>
-  private static baseUrl: string
+  private data!: Record<string, any>
+  private baseUrl!: string
+
   constructor(@Inject(POSTMAN_OPTIONS) private options: PostmanOptions) {
     this.init()
   }
 
-  async init() {
-    PostmanService.data = {
+  init() {
+    this.data = {
       info: {
         name: this.options.collectionName,
         version: "v2.0.0",
@@ -21,58 +23,37 @@ export class PostmanService {
       },
       item: [],
     }
-    PostmanService.baseUrl = this.options.url + this.options.prefix
+    this.baseUrl = joinUrl(this.options.url, this.options.prefix)
   }
 
+  /** Add a folder. `itemGroup.item` holds its requests. */
   addItemGroup = (itemGroup: Record<string, any>) => {
-    if (!PostmanService.data.item) {
-      PostmanService.data.item = [itemGroup]
-    } else {
-      PostmanService.data["item"].push(itemGroup)
-    }
+    if (!Array.isArray(itemGroup.item)) itemGroup.item = []
+    this.data.item.push(itemGroup)
   }
 
-  addItemGroupItem = (request: Record<string, any>, itemName: string) => {
-    if (!PostmanService.data.item) {
-      request.request.url = PostmanService.baseUrl + "/" + request.request.url
-      PostmanService.data.item = [request]
-    } else {
-      const itemGroups = PostmanService.data.item.filter(
-        (obj: { name: string }) => obj.name === itemName
-      )
-      if (!itemGroups.length) {
-        request.request.url = PostmanService.baseUrl + "/" + request.request.url
-        PostmanService.data.item.push(request)
-      } else {
-        const itemGroup = itemGroups[0]
-        const items = itemGroup.item
-        items.push(request)
-        request.request.url =
-          PostmanService.baseUrl +
-          "/" +
-          itemGroup.prefix +
-          "/" +
-          request.request.url
-        PostmanService.data.item = PostmanService.data.item.map(
-          (obj: { name: string }) => {
-            if (obj.name === itemGroup.name) {
-              return {
-                ...obj,
-                item: items,
-              }
-            }
-            return obj
-          }
-        )
-      }
-    }
+  /**
+   * Add a request to the folder with the given id (or name). `request.request.url` is the
+   * route path; it is prefixed with `url`, `prefix` and the folder's `prefix`.
+   * Without a matching folder the request is added at the top level.
+   */
+  addItemGroupItem = (request: Record<string, any>, itemGroup: string) => {
+    const groups: Record<string, any>[] = this.data.item.filter(
+      (obj: Record<string, any>) => Array.isArray(obj.item)
+    )
+    const group =
+      groups.find((obj) => obj.id === itemGroup) ||
+      groups.find((obj) => obj.name === itemGroup)
+    request.request.url = joinUrl(this.baseUrl, group?.prefix, request.request.url)
+    if (group) group.item.push(request)
+    else this.data.item.push(request)
   }
 
   printCollection = () => {
     const collectionPath = this.options.filePath
       ? this.options.filePath + "collection.json"
       : "collection.json"
-    fs.writeFileSync(collectionPath, JSON.stringify(PostmanService.data), {
+    fs.writeFileSync(collectionPath, JSON.stringify(this.data), {
       flag: "w+",
     })
   }
