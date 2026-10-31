@@ -1,7 +1,7 @@
 import { ModuleMetadata, Type } from "@nestjs/common"
 
 export interface PostmanOptions {
-  /** Register the module as global. */
+  /** Register the module as global, so `PostmanService` can be injected in every module. */
   isGlobal?: boolean
   /** Base URL of the app, e.g. `http://localhost:3000` or a Postman variable like `{{baseUrl}}`. */
   url: string
@@ -20,6 +20,8 @@ export interface PostmanAsyncOptionsFactory {
 }
 
 export interface PostmanAsyncOptions extends Pick<ModuleMetadata, "imports"> {
+  /** Register the module as global, so `PostmanService` can be injected in every module. */
+  isGlobal?: boolean
   useExisting?: Type<PostmanAsyncOptionsFactory>
   useClass?: Type<PostmanAsyncOptionsFactory>
   useFactory?: (...args: any[]) => Promise<PostmanOptions> | PostmanOptions

@@ -163,6 +163,7 @@ PostmanModule.registerAsync({ imports: [ConfigModule], useClass: PostmanConfig }
 | `prefix`         | no       | Global route prefix of your app (what you pass to `app.setGlobalPrefix()`), e.g. `v1`.                            |
 | `filePath`       | no       | Directory to write `collection.json` to. It is created if missing. Defaults to the current working directory.     |
 | `description`    | no       | Description of the collection.                                                                                     |
+| `isGlobal`       | no       | Register the module as global, so `PostmanService` can be injected in every module. `registerAsync()` accepts it too. |
 
 ---
 

@@ -25,6 +25,7 @@ export class PostmanModule {
         PostmanService,
         PostmanExplorer,
       ],
+      exports: [PostmanService],
     }
   }
 
@@ -33,6 +34,7 @@ export class PostmanModule {
    */
   static registerAsync(options: PostmanAsyncOptions): DynamicModule {
     return {
+      global: options.isGlobal || false,
       module: PostmanModule,
       imports: [DiscoveryModule, ...(options.imports || [])],
       providers: [
@@ -43,6 +45,7 @@ export class PostmanModule {
         PostmanService,
         PostmanExplorer,
       ],
+      exports: [PostmanService],
     }
   }
 
