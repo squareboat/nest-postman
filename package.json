@@ -1,6 +1,6 @@
 {
   "name": "@squareboat/nest-postman",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Generate a Postman collection from the routes of your NestJS application",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
